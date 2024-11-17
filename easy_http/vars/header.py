@@ -7,7 +7,8 @@ class DefaultHeaderDecorator(BaseParserDecorator):
     def get_headers_as_dict(self):
         default_headrs = self._get_default_headrs()
         headers_from_parser = self.parser.get_headers_as_dict()
-        headers_from_parser.update(default_headrs)
+        if default_headrs is not None:
+            headers_from_parser.update(default_headrs)
         return headers_from_parser
 
     def _get_default_headrs(self) -> dict:
