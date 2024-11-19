@@ -17,4 +17,7 @@ class HttpJsonParser(AbstractHTTPParser):
             else:
                 continue
             body_txt += line
-        return json.loads(body_txt)
+
+        if body_txt.strip():
+            return json.loads(body_txt)
+        return None
