@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import requests
+from requests.exceptions import ConnectionError
 import json
 from .session import AbstractRequestSession
 from .enum import ContentTypeEnum
@@ -38,14 +39,19 @@ class HttpFetcher():
 
     def send_with_save_session(self, request_obj: RequestObj):
         resp = self.send_request(request_obj)
-        self._print_response(resp)
-        self.save_or_update_cookies(resp.cookies)
+        if resp:
+            self._print_response(resp)
+            self.save_or_update_cookies(resp.cookies)
 
     def send_request(self, request_obj: RequestObj):
         try:
             return self._try_to_send(request_obj)
+        except ConnectionError:
+            print("Connection error")
+            return None
         except Exception as e:
-            print(f"Get Error when send request: {e}")
+            print(str(e))
+            return None
 
     def _try_to_send(self, request_obj: RequestObj):
         request_func = self.METHODS[request_obj.method]
@@ -73,7 +79,7 @@ class HttpFetcher():
             resp_content = resp.json()
             print(json.dumps(resp_content, indent=2))
         except ValueError:
-            print(resp.content)
+            print(resp.text)
 
     def save_or_update_cookies(self, cookies):
         try:

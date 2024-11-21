@@ -29,7 +29,10 @@ class DefaultHeaderDecorator(BaseParserDecorator):
                 finded_names.append(path_to_header_file)
 
         if len(finded_names) > 1:
-            raise Exception('Multiple header files found; please keep only one of them. Reserved names are headers.json, header.json, and h.json')
+            raise Exception(
+                'Multiple header files found; please keep only one of them.' +
+                'Reserved names are headers.json, header.json, and h.json'
+            )
         if len(finded_names) == 0:
             return None
         return finded_names[0]
