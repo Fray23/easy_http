@@ -1,7 +1,5 @@
 import uuid
 import re
-import os
-import json
 from .base import BaseParserDecorator
 
 
@@ -11,42 +9,34 @@ class BodyVarsDecorator(BaseParserDecorator):
         body = self.set_vars(body)
         return body
 
-    @classmethod
-    def set_vars(cls, _body):
-        """Main method to process and replace placeholders in the input body."""
+    def set_vars(self, _body):
         if isinstance(_body, dict):
-            cls._process_dict(_body)
+            self._process_dict(_body)
         elif isinstance(_body, list):
-            cls._process_list(_body)
+            self._process_list(_body)
         return _body
 
-    @classmethod
-    def _process_dict(cls, body):
-        """Process each key-value pair in a dictionary."""
+    def _process_dict(self, body):
         for key, value in body.items():
             if isinstance(value, str):
-                body[key] = cls._replace_placeholders(value)
+                body[key] = self._replace_placeholders(value)
             elif isinstance(value, dict):
-                cls._process_dict(value)
+                self._process_dict(value)
             elif isinstance(value, list):
-                cls._process_list(value)
+                self._process_list(value)
 
-    @classmethod
-    def _process_list(cls, items):
-        """Process each item in a list."""
+    def _process_list(self, items):
         for index, item in enumerate(items):
             if isinstance(item, dict):
-                cls._process_dict(item)
+                self._process_dict(item)
             elif isinstance(item, str):
-                items[index] = cls._replace_placeholders(item)
+                items[index] = self._replace_placeholders(item)
 
-    @classmethod
-    def _replace_placeholders(cls, value):
-        """Replace placeholders in a string with corresponding generated values."""
-
+    def _replace_placeholders(self, value):
         value = value.replace('{{hex}}', uuid.uuid4().hex)
         value = value.replace('{{uuid}}', str(uuid.uuid4()))
-        value = cls._set_var_uuid_slice(value)
+        value = self._set_var_uuid_slice(value)
+        value = self._set_custom_vars(value)
         return value
 
     @staticmethod
@@ -65,4 +55,16 @@ class BodyVarsDecorator(BaseParserDecorator):
             return uuid.uuid4().hex[:slice_length]
 
         value = re.sub(pattern, replace_uuid_slice, value)
+        return value
+
+    def _set_custom_vars(self, value):
+        vars = self.get_vars_from_config()
+        for k,v in vars.items():
+            if type(value) is str:
+                if type(v) is not str:
+                    if k in value:
+                        value = v
+                        break
+                else:
+                    value = value.replace(k, v)
         return value
