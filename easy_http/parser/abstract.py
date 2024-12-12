@@ -30,7 +30,7 @@ class AbstractParser(ABC):
 
 class AbstractHTTPParser(AbstractParser):
     def get_url(self):
-        url_pattern = r"https?:\/\/[\w\-\.]+(?:\:[0-9]+)?[\/\w\-\.~:\/?#\[\]@!$&'()*+,;=]*"
+        url_pattern = r"https?://.*"
         first_line = self.list_file_lines[0]
 
         match = re.search(url_pattern, first_line)
