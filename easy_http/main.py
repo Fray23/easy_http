@@ -1,7 +1,7 @@
 import sys
 from parser import HttpJsonParser
 from fetcher import RequestSession, HttpFetcher, RequestObj
-from vars import DefaultHeaderDecorator, BodyVarsDecorator
+from vars import DefaultHeaderDecorator, BodyVarsDecorator, UrlVarsDecorator
 
 
 def main():
@@ -18,6 +18,7 @@ def main():
     )
     parser = DefaultHeaderDecorator(parser)
     parser = BodyVarsDecorator(parser)
+    parser = UrlVarsDecorator(parser)
 
     session = RequestSession(
         session_path=project_path,
